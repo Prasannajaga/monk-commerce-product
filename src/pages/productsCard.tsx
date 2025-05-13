@@ -2,9 +2,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select' 
 import type { Identifier, XYCoord } from 'dnd-core'
-import { GripVertical, X } from 'lucide-react'
-import type { FC } from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { GripVertical, Pencil, X } from 'lucide-react'
+import { useRef } from 'react' 
 import { useDrag, useDrop } from 'react-dnd'
 import type { addProduct } from './products'
 
@@ -13,8 +12,7 @@ export const ItemTypes = {
 } 
 
 const style = { 
-  padding: '0.5rem 1rem',
-  marginBottom: '.5rem',
+  padding: '0.5rem 1rem', 
   backgroundColor: 'white',
   cursor: 'move',
 }
@@ -32,19 +30,8 @@ interface DragItem {
   type: string
 }
 
-const ProductCard: FC<CardProps | any> = ({ index, id, title , discount, discountType,  moveCard , removeProduct } : CardProps | any) => {
-
-   const [titles , setTitle] = useState<string>(title); 
-   const [discounts , setDiscount] = useState<string>(discount); 
-   const [disType , setDiscountType] = useState<string>(discountType); 
-
-
-   useEffect(() =>{
-       setTitle(title);
-       setDiscount(discount);
-       setDiscountType(discountType);  
-   }, [title , discount , discountType])
-
+function ProductCard({ index, id, title , discount, price , discountType,  moveCard , isSmall , removeProduct , onEdit} : CardProps | any) {
+ 
 
   const ref = useRef<HTMLDivElement>(null)
   const [{ handlerId }, drop] = useDrop<
@@ -126,19 +113,21 @@ const ProductCard: FC<CardProps | any> = ({ index, id, title , discount, discoun
         <div className="flex items-center space-x-4 p-2 outline-none rounded-md"> 
               <GripVertical /> 
               <span className="text-sm">{index + 1}.</span>
+              <div className='relative'>
+                <Input
+                  defaultValue={title} 
+                  className={`primary-inp ${isSmall?  '!w-32' : 'w-56'}  pr-6 truncate placeholder:truncate placeholder:text-gray-500`}
+                />
+                <div className=' cursor-pointer  absolute right-2 top-2'>
+                  <Pencil onClick={() => onEdit(true)}  className='w-4 h-4 stroke-gray-400'/>
+                </div>
+              </div>
               <Input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-1/2 primary-inp"
-              />
-              <Input
-                value={discount ?? 0}
-                onChange={(e) => setDiscount(e.target.value)}
+                defaultValue={price ?? discount} 
                 className="w-24 primary-inp"
               />
               <Select
-                value={discountType ?? "Flat Off"}
-                onValueChange={(value) => setDiscountType(value)}
+                defaultValue={discountType ?? "Flat Off"} 
               >
                 <SelectTrigger className="w-32 border-tr z-40">
                   <SelectValue placeholder="Discount Type" />

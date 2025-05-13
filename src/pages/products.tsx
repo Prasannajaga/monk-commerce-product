@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react'; 
-import { ChevronDown, ChevronUp, GripVertical, X } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
  import { Button } from '@/components/ui/button'; 
 import DialogModal from './dialog';
 import type { Product, productVariant } from '@/models/model';
@@ -25,34 +25,15 @@ export type addProduct = Partial<Product & {
       discount : "0",
       discountType : "% Off"
     }
-  ]); 
-
-  const onVariantChange = (e:React.ChangeEvent<HTMLInputElement> , index : number , id : number) =>{
-      const data = products[index];   
-      if(data.variants){
-          const variants = data.variants.map(x =>{
-              if(x.id === id){
-                  const key = e.target.name as "title" | "discount" | "discountType";
-                  x[key] = e.target.value;
-              }
-              return x;
-          })
-          data.variants = variants;
-          setProducts(prev => [...prev]);
-      }
-  }
-
-  const removeProduct = (id: number) => {
-    setProducts(products.filter(product => product.id !== id));
-  };
-
+  ]);  
+ 
   const onShowVariant = (product : addProduct) =>{
     product.selected = product.selected === undefined ? true : !product.selected;
     setProducts(prev => [...prev]);
   }
 
   const onProductAdd = useCallback((data : addProduct[]) =>{ 
-    setProducts((prev :addProduct[]) => [...data]);
+    setProducts([...data]);
   } , []);
 
 
@@ -67,8 +48,16 @@ export type addProduct = Partial<Product & {
       )
   }, []) 
 
-  const removeCard = useCallback((id : number) => {
+  const removeProduct = useCallback((id : number) => {
       setProducts(prev => prev.filter(x=>x.id != id));
+  } , []);
+
+  const onClose = useCallback((v:boolean) => {
+      setOpen(v);
+  } , []);
+
+  const onEdit = useCallback((v:boolean) => {
+      setOpen(v);
   } , []);
 
   const onVarChange = useCallback((prId : number , data : productVariant[]) => {
@@ -80,7 +69,7 @@ export type addProduct = Partial<Product & {
   return (
     <div className="p-4">
       <h2 className="text-lg font-semibold mb-4">Add Products</h2>
-      <div className="space-y-4">
+      <div className="flex flex-col gap-2">
            <DndProvider backend={HTML5Backend}> 
               {products.map((product, index) => (
                 <section  key={product.id}> 
@@ -89,30 +78,38 @@ export type addProduct = Partial<Product & {
                     id={product.id}
                     index={index}
                     title={product.title}
-                    discount={product.discount}
+                    discount={product.discount ?? 0}
                     discountType={product.discountType}
                     moveCard={moveCard}
-                    removeProduct={removeCard} 
+                    removeProduct={removeProduct}
+                    onEdit={onEdit} 
                   > </ProductCard> 
 
-                  <div className='flex flex-col gap-4 justify-self-end mr-4 cursor-pointer' >
-                      <p onClick={() => onShowVariant(product)} className='text-blue-400 flex self-end underline'> {product.selected ? 'Hide' : 'Show '} variants {product.selected ?  <ChevronUp /> : <ChevronDown />}</p> 
-                      <section className={`flex flex-col gap-2 ml-10  ${product.selected ? 'block' : 'hidden'}`}>
-                          <VariantCard 
-                            variants={product.variants}
-                            productIndex={index}
-                            onVarChange={onVarChange}
-                          ></VariantCard> 
+                  <div className='flex w-full  flex-col gap-4 justify-self-end  cursor-pointer' >
+                      <p onClick={() => onShowVariant(product)} className='text-blue-400 flex self-end underline mr-7'> {product.selected ? 'Hide' : 'Show '} variants {product.selected ?  <ChevronUp /> : <ChevronDown />}</p> 
+                      <section className={`flex flex-col gap-2 items-end ${product.selected ? 'block' : 'hidden'}`}>
+                         {product?.variants && product.variants.filter(d => d.selected)?.length > 0 ?
+                            <VariantCard 
+                              variants={product.variants}
+                              productIndex={index}
+                              onVarChange={onVarChange} 
+                              onEdit={onEdit} 
+                            ></VariantCard> 
+                          : 
+                          <div className='self-center'>No variants found</div> 
+                         }
                       </section> 
                   </div>
                 </section> 
               ))} 
             </DndProvider>
       </div>
-      <Button onClick={() => setOpen(!open)} className="btn-primary float-right hover:text-white">
+      <Button onClick={() => setOpen(!open)} className="btn-primary float-right hover:text-white mr-8">
         Add Product
       </Button>
-      <DialogModal initial={open} onAdd={onProductAdd}/>  
+      {open && 
+         <DialogModal onClose={onClose} initial={open} onAdd={onProductAdd}/>  
+      }
     </div>
   );
 };

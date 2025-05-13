@@ -78,7 +78,7 @@
 
  
 .primary-inp{
-  @apply border shadow-lg focus-visible:ring-0;
+  @apply border shadow-lg focus-visible:ring-0 ;
 }
 
 .border-tr{
@@ -86,7 +86,7 @@
 }
 
 .btn-primary{
-  @apply mt-4 bg-primary border-white hover:border-primary hover:text-primary;
+  @apply mt-8 w-32 bg-primary border-white hover:border-primary hover:text-primary;
 }
 
 
@@ -98,4 +98,25 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+
+/* index.css */
+::-webkit-scrollbar {
+  width: 6px; /* thin scrollbar */
+  height: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: gray; /* gray-400 */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Remove scrollbar buttons (arrows) */
+::-webkit-scrollbar-button {
+  display: none;
 }

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Command , CommandInput, CommandItem } from "@/components/ui/command";
+import { Command , CommandItem } from "@/components/ui/command";
 import {
     Dialog,
     DialogContent,
@@ -12,14 +12,17 @@ import { useCallback, useEffect, useState } from "react";
 import debounce from 'lodash.debounce'; 
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Input } from "@/components/ui/input";
-import { ShoppingCart } from "lucide-react";
+import { Search, ShoppingCart } from "lucide-react";
+import { fetchProducts } from "@/service/productService";
 
 export type dialogProps = {
     initial : boolean ,
     onAdd : (data : any) => void
+    onClose : (v:boolean) => void
 }
+ 
 
-export default function DialogModal({ initial , onAdd }: dialogProps) {
+export default function DialogModal({ initial , onAdd , onClose}: dialogProps) {
 
     const [open, setOpen] = useState(initial);
     const [page, setPage] = useState<number>(0);
@@ -33,13 +36,13 @@ export default function DialogModal({ initial , onAdd }: dialogProps) {
         getProducts("", page); 
     }, [initial]);
 
+    useEffect(() =>{
+        onClose(open);
+    }, [open])
+
     async function getProducts(search: string = "", page = 0, limit = 10) {
-        const response = await fetch(`https://stageapi.monkcommerce.app/task/products/search?search=${search}&page=${page}&limit=${limit}`, {
-            headers: {
-                "x-api-key": "72njgfa948d9aS7gs5"
-            }
-        });
-        const data = await response.json();
+
+        const data = await fetchProducts(search , page , limit);
         if (data) {
             setAvailableProducts(prev => {
                 if(search.trim().length > 0){
@@ -48,6 +51,9 @@ export default function DialogModal({ initial , onAdd }: dialogProps) {
                 return [...prev, ...data];
             });
         }
+        else{
+            setAvailableProducts([]);
+        } 
 
     }
 
@@ -119,26 +125,30 @@ export default function DialogModal({ initial , onAdd }: dialogProps) {
     return (
         <>
             <Dialog modal={true} open={open} onOpenChange={() => setOpen(!open)}>
-                <DialogContent className="max-w-[45rem]">
-                    <DialogHeader>
+                <DialogContent className="max-w-[45rem] border-b p-0 gap-0">
+
+                    <DialogHeader className="px-4 py-3">
                         <DialogTitle>Select a Product</DialogTitle>
                     </DialogHeader>
 
-                    <Command shouldFilter={false} onVolumeChange={() => setSearchValue("")}>
-                        
-                        <CommandInput  value={searchValue} onValueChange={setSearchValue} placeholder="Search products..." />
-
+                    <Command className="px-0 py-2" shouldFilter={false} onVolumeChange={() => setSearchValue("")}> 
+                        <div className="px-4 relative">
+                            <Input className="pl-8" value={searchValue} onChange={(e) => setSearchValue(e.target.value)}  placeholder="Search product..."></Input>
+                            <Search className="absolute left-5 top-2 w-5 h-5" />
+                        </div> 
+ 
                         <section id="scrollableDiv" className="h-96 overflow-auto mt-2">
                             <InfiniteScroll
                                 dataLength={availableProducts.length}
                                 next={handleScroll}
-                                hasMore={true}
-                                loader={<div className="text-center">loading ...</div>}
+                                hasMore={availableProducts.length != 0}
+                                loader={<div className="text-center mt-4">Loading ...</div>}
                                 scrollableTarget="scrollableDiv"
+                                endMessage={<div className="text-center mt-4"> No products found </div>}
                             >
                                 {availableProducts.map((product, index) => (
                                     <section key={index}>
-                                        <CommandItem className="border-b"
+                                        <CommandItem className="px-5 border-b"
                                             key={product.id}
                                             value={product.title}>
                                             <Input onChange={(e) =>  onSelectProduct(e  , index)} id="title" type="checkbox" className="w-4"></Input>
@@ -147,13 +157,13 @@ export default function DialogModal({ initial , onAdd }: dialogProps) {
                                              : <ShoppingCart />}
                                             <label htmlFor="title">{product.title}</label>
                                         </CommandItem>
-                                        <div className="mt-2 px-10">
+                                        <div className="mt-2">
                                             {product.variants &&
                                                 <>
                                                     {product.variants.map(((variant) => (
-                                                        <div key={variant.id} className="flex gap-2">
+                                                        <div key={variant.id} className="flex gap-2 px-14 border-b">
                                                             <Input onChange={(e) => onVariantSelect(e , index , variant.id )} id="title" type="checkbox" className="w-4"></Input>
-                                                            <div className="flex gap-2 w-full p-2 justify-between items-center border-b" key={variant.id}>
+                                                            <div className="flex gap-2 w-full p-2 justify-between items-center " key={variant.id}>
                                                                 <label htmlFor="title" className="text-sm flex-[2.5]">{variant.title}</label>
                                                                 <div className="flex flex-1 justify-between">
                                                                     <label htmlFor="title" className="text-sm">{variant.inventory_quantity ?? 0} available</label>
@@ -169,10 +179,10 @@ export default function DialogModal({ initial , onAdd }: dialogProps) {
 
                                 ))}
                             </InfiniteScroll>
-                        </section>
-
+                        </section> 
                     </Command>
-                    <DialogFooter className="!justify-between"> 
+
+                    <DialogFooter className="!justify-between p-4"> 
                             <div className="flex-1">{selectedProducts.length} product selected</div>
                             <div className="flex gap-2">
                                 <Button onClick={() => setOpen(!open)} className="bg-white  text-primary2 hover:text-white border border-primary">cancel</Button>
