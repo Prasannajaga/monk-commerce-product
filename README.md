@@ -1,54 +1,38 @@
-# React + TypeScript + Vite
+# 🛒 Monk Commerce
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project was built as part of an interview assignment, and it truly inspired me to level up my front-end engineering skills. From user experience to performance optimizations, every decision was made with care and intent.
+ 
 
-Currently, two official plugins are available:
+## 🚀 Tech Stack & Key Highlights
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🧩 **ShadCN + TailwindCSS** — for a modern, clean, and consistent UI experience
+- ✅ **TypeScript** — for type safety and better DX (developer experience)
+- 🧠 **useCallback & memoization** — to prevent unnecessary re-renders and boost performance
+- 🔄 **react-infinite-scroll-component** — for seamless infinite pagination
+- 🖱️ **react-dnd** — to implement smooth and accessible drag-and-drop reordering
+- ⏱️ **Debounced Search** — for efficient filtering and reduced API load while typing
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## ❤️ What I Loved About This Challenge
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+This assignment was more than just building a feature — it challenged me to think like a product engineer:
+- I focused on user experience, edge cases, and scalability
+- Explored better state and component optimization patterns
+- Built a clean and extensible UI that’s also dev-friendly
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📷 Preview
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+> _(Insert a screenshot or GIF here of the cart in action)_
+
+---
+
+## 📂 How to Run
+
+```bash
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+npm install
+npm run dev
