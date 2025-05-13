@@ -25,7 +25,9 @@ This assignment was more than just building a feature — it challenged me to th
 
 ## 📷 Preview
 
-> _(Insert a screenshot or GIF here of the cart in action)_
+![Preview 1](mc1.png)
+
+![Preview 2](mc2.png)
 
 ---
 
