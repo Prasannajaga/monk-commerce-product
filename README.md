@@ -25,9 +25,13 @@ This assignment was more than just building a feature — it challenged me to th
 
 ## 📷 Preview
 
+![Demo Preview](mc-site.gif)
+
 ![Preview 1](mc1.png)
 
 ![Preview 2](mc2.png)
+
+
 
 ---
 
