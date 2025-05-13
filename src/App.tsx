@@ -1,6 +1,4 @@
- 
-import './App.css'   
-import SmoothLiveDndList from './pages/dnd'
+import './App.css'    
 import Products from './pages/products'
 
 function App() { 
@@ -8,8 +6,7 @@ function App() {
   return (
     <>
      <main className='flex justify-center'>
-       <Products/>
-       {/* <SmoothLiveDndList/> */}
+       <Products/> 
      </main>
    </>
   )
