@@ -152,8 +152,8 @@ export default function DialogModal({ initial , onClose  , onAdd}: dialogProps) 
                                     <section key={index}>
                                         <CommandItem className="px-5 border-b"
                                             key={product.id}
-                                            value={product.title}> 
-                                            <Input onChange={(e) => onSelectProduct(e  , index)} checked={product.selected} id={`product ${product.id}`} type="checkbox" className="w-4 bg-primary2 checked:!bg-primary2 checked:!border-primary2"></Input>
+                                            value={product.title}>  
+                                            <Input onChange={(e) => onSelectProduct(e  , index)} checked={product.selected} id={`product ${product.id}`} type="checkbox" className="w-4 accent-[#008060] "></Input>
                                             {product.image.src ?
                                              <img className="w-10 rounded-md border-none h-10 shadow-md" src={product.image.src} alt="not found ..." />
                                              : <ShoppingCart />}
@@ -164,7 +164,7 @@ export default function DialogModal({ initial , onClose  , onAdd}: dialogProps) 
                                                 <>
                                                     {product.variants.map(((variant) => (
                                                         <div key={variant.id} className="flex gap-2 px-14 border-b hover:bg-gray-50">
-                                                            <Input onChange={(e) => onVariantSelect(e , index , variant.id )} checked={variant.selected} id={`variant ${variant.id}`} type="checkbox" className="w-4"></Input>
+                                                            <Input onChange={(e) => onVariantSelect(e , index , variant.id )} checked={variant.selected} id={`variant ${variant.id}`} type="checkbox" className="w-4 accent-[#008060]"></Input>
                                                             <div className="flex gap-2 w-full p-2 justify-between items-center " key={variant.id}>
                                                                 <label htmlFor={`variant ${variant.id}`} className="text-sm flex-[2.5]">{variant.title}</label>
                                                                 <div className="flex flex-1 justify-between">
