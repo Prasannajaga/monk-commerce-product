@@ -13,16 +13,16 @@ import debounce from 'lodash.debounce';
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Input } from "@/components/ui/input";
 import { Search, ShoppingCart } from "lucide-react";
-import { fetchProducts } from "@/service/productService";
-
+import { fetchProducts } from "@/service/productService";  
 export type dialogProps = {
-    initial : boolean ,
+    initial : boolean , 
     onAdd : (data : any) => void
+    onEdit : (id : number , data : any) => void
     onClose : (v:boolean) => void
 }
  
 
-export default function DialogModal({ initial , onAdd , onClose}: dialogProps) {
+export default function DialogModal({ initial , onClose  , onAdd}: dialogProps) {
 
     const [open, setOpen] = useState(initial);
     const [page, setPage] = useState<number>(0);
@@ -58,14 +58,16 @@ export default function DialogModal({ initial , onAdd , onClose}: dialogProps) {
     }
 
     const onSelectProduct = ({target : {checked}}  : React.ChangeEvent<HTMLInputElement>,   index : number) =>{  
-        const data = availableProducts[index]; 
+        const data : Product = availableProducts[index]; 
+        data.selected = checked;
         setSelectedProducts(prev =>{ 
             let concat = prev;
+            data.variants.forEach(x => x.selected = checked);  
             if(checked){
                concat.push(data);
             } 
             else{
-                concat = concat.filter(x => x.id != data.id);
+               concat = concat.filter(x => x.id != data.id);
             } 
             return [...concat];
         });
@@ -82,20 +84,20 @@ export default function DialogModal({ initial , onAdd , onClose}: dialogProps) {
                 return x;
             })
             data.variants = variants;
-        }
+        } 
 
         setSelectedProducts(prev =>{  
             return prev.map(x => {
                 if(x.id === data.id){
                     x = data;
                 }
-                return x
+                return x;
             });
         });
     };
 
-    const addProduct = () => { 
-        onAdd(selectedProducts);
+    const addProduct = () => {  
+        onAdd(selectedProducts); 
         setOpen(!open);
     };
 
@@ -132,7 +134,7 @@ export default function DialogModal({ initial , onAdd , onClose}: dialogProps) {
                     </DialogHeader>
 
                     <Command className="px-0 py-2" shouldFilter={false} onVolumeChange={() => setSearchValue("")}> 
-                        <div className="px-4 relative">
+                        <div className="px-4 relative"> 
                             <Input className="pl-8" value={searchValue} onChange={(e) => setSearchValue(e.target.value)}  placeholder="Search product..."></Input>
                             <Search className="absolute left-5 top-2 w-5 h-5" />
                         </div> 
@@ -150,24 +152,24 @@ export default function DialogModal({ initial , onAdd , onClose}: dialogProps) {
                                     <section key={index}>
                                         <CommandItem className="px-5 border-b"
                                             key={product.id}
-                                            value={product.title}>
-                                            <Input onChange={(e) =>  onSelectProduct(e  , index)} id="title" type="checkbox" className="w-4"></Input>
+                                            value={product.title}> 
+                                            <Input onChange={(e) => onSelectProduct(e  , index)} checked={product.selected} id={`product ${product.id}`} type="checkbox" className="w-4 bg-primary2 checked:!bg-primary2 checked:!border-primary2"></Input>
                                             {product.image.src ?
                                              <img className="w-10 rounded-md border-none h-10 shadow-md" src={product.image.src} alt="not found ..." />
                                              : <ShoppingCart />}
-                                            <label htmlFor="title">{product.title}</label>
+                                            <label htmlFor={`product ${product.id}`}>{product.title}</label>
                                         </CommandItem>
-                                        <div className="mt-2">
+                                        <div className="">
                                             {product.variants &&
                                                 <>
                                                     {product.variants.map(((variant) => (
-                                                        <div key={variant.id} className="flex gap-2 px-14 border-b">
-                                                            <Input onChange={(e) => onVariantSelect(e , index , variant.id )} id="title" type="checkbox" className="w-4"></Input>
+                                                        <div key={variant.id} className="flex gap-2 px-14 border-b hover:bg-gray-50">
+                                                            <Input onChange={(e) => onVariantSelect(e , index , variant.id )} checked={variant.selected} id={`variant ${variant.id}`} type="checkbox" className="w-4"></Input>
                                                             <div className="flex gap-2 w-full p-2 justify-between items-center " key={variant.id}>
-                                                                <label htmlFor="title" className="text-sm flex-[2.5]">{variant.title}</label>
+                                                                <label htmlFor={`variant ${variant.id}`} className="text-sm flex-[2.5]">{variant.title}</label>
                                                                 <div className="flex flex-1 justify-between">
-                                                                    <label htmlFor="title" className="text-sm">{variant.inventory_quantity ?? 0} available</label>
-                                                                    <label htmlFor="title" className="text-sm">${Math.floor(variant.price)}</label>
+                                                                    <label htmlFor={`variant ${variant.id}`} className="text-sm">{variant.inventory_quantity ?? 0} available</label>
+                                                                    <label htmlFor={`variant ${variant.id}`} className="text-sm">${Math.floor(variant.price)}</label>
                                                                 </div>
                                                             </div>
                                                         </div>

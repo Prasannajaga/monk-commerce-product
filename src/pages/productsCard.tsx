@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select' 
 import type { Identifier, XYCoord } from 'dnd-core'
 import { GripVertical, Pencil, X } from 'lucide-react'
-import { useRef } from 'react' 
+import { useEffect, useRef, useState } from 'react' 
 import { useDrag, useDrop } from 'react-dnd'
 import type { addProduct } from './products'
 
@@ -19,7 +19,8 @@ const style = {
 
 export type CardProps  = Partial<addProduct> & {
   id: any 
-  index: number
+  index: number,
+  type : "VARIANT" | "PRODUCT"
   moveCard: (dragIndex: number, hoverIndex: number) => void
   removeProduct: (hoverIndex: number) => void
 }
@@ -30,8 +31,24 @@ interface DragItem {
   type: string
 }
 
-function ProductCard({ index, id, title , discount, price , discountType,  moveCard , isSmall , removeProduct , onEdit} : CardProps | any) {
+function ProductCard({ index, id, title : tValue , discount : discountValue , price , type , discountType : discountTypeValue,  moveCard  ,
+   isSmall , removeProduct , onEdit , showDiscount , onChange} : CardProps | any) {
  
+
+  const [isShow , setShow] = useState(showDiscount ?? false); 
+  const [title , setTitle] = useState(tValue); 
+  const [discount , setDiscount] = useState(discountValue ?? price); 
+  const [discountType , setDiscountType] = useState(discountTypeValue ?? "Flat Off"); 
+
+
+  useEffect(() =>{
+      // only for variant
+      if(isSmall){
+        onChange(id , {
+          title : title , discount : discount , discountType: discountType
+        })
+      }
+  }, [title , discount , discountType]);
 
   const ref = useRef<HTMLDivElement>(null)
   const [{ handlerId }, drop] = useDrop<
@@ -39,7 +56,7 @@ function ProductCard({ index, id, title , discount, price , discountType,  moveC
     void,
     { handlerId: Identifier | null }
   >({
-    accept: ItemTypes.CARD,
+    accept: type,
     collect(monitor) {
       return {
         handlerId: monitor.getHandlerId(),
@@ -68,11 +85,7 @@ function ProductCard({ index, id, title , discount, price , discountType,  moveC
       const clientOffset = monitor.getClientOffset()
 
       // Get pixels to the top
-      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top
-
-      // Only perform the move when the mouse has crossed half of the items height
-      // When dragging downwards, only move when the cursor is below 50%
-      // When dragging upwards, only move when the cursor is above 50%
+      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top 
 
       // Dragging downwards
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
@@ -85,18 +98,14 @@ function ProductCard({ index, id, title , discount, price , discountType,  moveC
       }
 
       // Time to actually perform the action
-      moveCard(dragIndex, hoverIndex)
-
-      // Note: we're mutating the monitor item here!
-      // Generally it's better to avoid mutations,
-      // but it's good here for the sake of performance
-      // to avoid expensive index searches.
-      item.index = hoverIndex
+      moveCard(dragIndex, hoverIndex) 
+      item.index = hoverIndex;
+      
     },
   })
 
   const [{ isDragging }, drag] = useDrag({
-    type: ItemTypes.CARD,
+    type: type,
     item: () => {
       return { id, index }
     },
@@ -106,37 +115,50 @@ function ProductCard({ index, id, title , discount, price , discountType,  moveC
   })
 
   const opacity = isDragging ? 0 : 1
-  drag(drop(ref))
+  drag(drop(ref));
 
   return (
     <div ref={ref} style={{ ...style, opacity }} data-handler-id={handlerId}>
         <div className="flex items-center space-x-4 p-2 outline-none rounded-md"> 
-              <GripVertical /> 
+              <GripVertical className='stroke-gray-400 ' /> 
               <span className="text-sm">{index + 1}.</span>
               <div className='relative'>
                 <Input
-                  defaultValue={title} 
-                  className={`primary-inp ${isSmall?  '!w-32' : 'w-56'}  pr-6 truncate placeholder:truncate placeholder:text-gray-500`}
+                  name='title'
+                  value={title}  
+                  onChange={(e) => setTitle(e.target.value)}
+                  className={`primary-inp ${isSmall?  '!w-32' : 'w-56'} pr-6 truncate placeholder:truncate placeholder:text-gray-500`}
                 />
                 <div className=' cursor-pointer  absolute right-2 top-2'>
                   <Pencil onClick={() => onEdit(true)}  className='w-4 h-4 stroke-gray-400'/>
                 </div>
               </div>
-              <Input
-                defaultValue={price ?? discount} 
-                className="w-24 primary-inp"
-              />
-              <Select
-                defaultValue={discountType ?? "Flat Off"} 
-              >
-                <SelectTrigger className="w-32 border-tr z-40">
-                  <SelectValue placeholder="Discount Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="% Off">% Off</SelectItem>
-                  <SelectItem value="Flat Off">Flat Off</SelectItem>
-                </SelectContent>
-              </Select>
+
+
+              {(!isShow && !isSmall) ?
+                  <Button className='flex-1' onClick={() => setShow(true)}>Add discount</Button> : 
+                  <>
+                    <Input
+                      value={discount} 
+                      onChange={(e) => setDiscount(e.target.value)}
+                      className="w-24 primary-inp"
+                    />
+                    <Select
+                      value={discountType}
+                      onValueChange={(e) => setDiscountType(e)} 
+                    >
+                    <SelectTrigger className="w-32 border-tr z-40">
+                        <SelectValue placeholder="Discount Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="% Off">% Off</SelectItem>
+                        <SelectItem value="Flat Off">Flat Off</SelectItem>
+                      </SelectContent>
+                    </Select> 
+                  </>
+              } 
+
+
               <Button
                 variant="ghost"
                 size="icon"

@@ -27,4 +27,5 @@ export type Product  = {
   admin_graphql_api_id: string;
   status: string;
   variants: productVariant[]; 
+  selected ?: boolean,
 }
