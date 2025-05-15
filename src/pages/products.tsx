@@ -18,8 +18,7 @@ export type addProduct = Partial<Product & {
 }>
 
   const Products: React.FC = () => {
-  const [open, setOpen] = useState(false); 
-  const [selectedId, setSelectedId] = useState("");
+  const [open, setOpen] = useState(false);  
   const [products, setProducts] = useState<addProduct[]>([
     {
       id : 0,
